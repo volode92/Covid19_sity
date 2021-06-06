@@ -9,6 +9,7 @@ import pygame.freetype
 pygame.init()
 pygame.font.init()
 myfont = pygame.font.SysFont('arial',20)
+
 #size
 SIZE_DISTRICT_X = 500
 SIZE_DISTRICT_Y = 400
