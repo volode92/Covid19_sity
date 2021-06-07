@@ -1,6 +1,5 @@
 import pygame
 import random
-import numpy as np
 import matplotlib.pyplot as plt
 import time
 import sys
@@ -68,13 +67,13 @@ social_jump = 2
 
 
 def take_color_point(disease, cure, live):
-    if live == False:
-        return (255, 192, 203)
+    if not live:
+        return 255, 192, 203
     if disease:
-        return (255, 0, 0)
+        return 255, 0, 0
     if cure:
-        return (0, 255, 0)
-    return (0, 0, 255)
+        return 0, 255, 0
+    return 0, 0, 255
 
 
 district1_dict = {'l': l1, 'r': r1, 'u': u1, 'd': d1}
@@ -95,7 +94,6 @@ def take_poind_pos(x, y, i):
         return x + dist_district['4']['l'], y + dist_district['4']['u']
 
 
-
 def show_info():
     pygame.draw.rect(window, (255, 255, 255), pr1, 2)
     pygame.draw.rect(window, (255, 255, 255), pr2, 2)
@@ -108,7 +106,7 @@ def show_info():
                 (LEFT_INDENT + SIZE_DISTRICT_X + HORIZONTAL_INDENT, SIZE_DISTRICT_Y + VERTICAL_INDENT))
 
 
-class People():
+class People:
     def __init__(self, x, y, district):
         self.district = district
         self.posx, self.posy = take_poind_pos(x, y, district)
@@ -162,33 +160,36 @@ class People():
                 self.timeafterdisease = 0
 
 
-class Sity():
+class Sity:
     def __init__(self, district, num_people):
         self.people_list = []
         for peop in range(num_people):
-            new_people = People(random.randint(5, SIZE_DISTRICT_X - 5), random.randint(5, SIZE_DISTRICT_Y - 5), district)
+            new_people = People(random.randint(5, SIZE_DISTRICT_X - 5), random.randint(5, SIZE_DISTRICT_Y - 5),
+                                district)
             self.people_list.append(new_people)
 
-    def chahgestat(self, People1, People2):
-        if People1.disease:
-            if People2.disease == False and People2.cure == False:
-                People2.disease = True if random.randint(0, 100) < percent_transfer else False
-                People2.color = (255, 0, 0) if People2.disease else (0, 0, 255)
-        if People2.disease:
-            if People1.disease == False and People1.cure == False:
-                People1.disease = True if random.randint(0, 100) < percent_transfer else False
-                People1.color = (255, 0, 0) if People1.disease else (0, 0, 255)
+    def chahgestat(self, people1, people2):
+        if people1.disease:
+            if people2.disease == False and people2.cure == False:
+                people2.disease = True if random.randint(0, 100) < percent_transfer else False
+                people2.color = (255, 0, 0) if people2.disease else (0, 0, 255)
+        if people2.disease:
+            if people1.disease == False and people1.cure == False:
+                people1.disease = True if random.randint(0, 100) < percent_transfer else False
+                people1.color = (255, 0, 0) if people1.disease else (0, 0, 255)
 
-class Hospital():
+
+class Hospital:
     def __init__(self):
         pass
 
 
-class Cemetery():
+class Cemetery:
     def __init__(self):
         pass
 
-class ChainComand():
+
+class ChainComand:
     def __init__(self, num_people):
         self.sitylist = []
         for i in range(4):
@@ -196,7 +197,7 @@ class ChainComand():
             self.sitylist.append(new_sity)
 
     def start_inf(self):
-        inf_distr = random.randint(0, len(self.sitylist)-1)
+        inf_distr = random.randint(0, len(self.sitylist) - 1)
         zero_pacient = random.randint(0, len(self.sitylist[inf_distr].people_list))
         self.sitylist[inf_distr].people_list[zero_pacient].disease = True
         self.sitylist[inf_distr].people_list[zero_pacient].color = (255, 0, 0)
@@ -241,7 +242,8 @@ class ChainComand():
                                                           random.randint(5, SIZE_DISTRICT_Y - 5), rand_distr2)
             self.sitylist[rand_distr2].people_list.append(tmp_peop)
 
-class Log():
+
+class Log:
     def __init__(self):
         self.live_people = []
         self.die_people = []
@@ -260,7 +262,7 @@ class Log():
         tmp_disease = 0
         for sity in sitieslist:
             for ppl in sity.people_list:
-                if ppl.live == False:
+                if not ppl.live:
                     tmp_die += 1
                     continue
                 if ppl.disease:
@@ -291,7 +293,7 @@ class Log():
             'cure_people': self.cure_people,
             'disease_people': self.disease_people,
         }
-        color = ['blue','black','lightblue','green','red']
+        color = ['blue', 'black', 'lightblue', 'green', 'red']
         fig, ax = plt.subplots()
         ax.stackplot(self.day_array, data.values(),
                      labels=data.keys(), colors=color)
@@ -303,9 +305,7 @@ class Log():
         plt.show()
 
 
-
-
-CoR = ChainComand(1000) #создаем города с людьми
+CoR = ChainComand(1000)  # создаем города с людьми
 CoR.start_inf()
 log = Log()
 
@@ -326,7 +326,7 @@ while END:
     CoR.transfer()
     if frame % FPS == 0:
         END = log.update_data(CoR.sitylist)
-        #print(frame, '%.07f' % (time.time() - start_time))
+        # print(frame, '%.07f' % (time.time() - start_time))
         start_time = time.time()
 
 log.show_graph()
