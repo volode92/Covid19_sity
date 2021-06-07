@@ -291,9 +291,10 @@ class Log():
             'cure_people': self.cure_people,
             'disease_people': self.disease_people,
         }
+        color = ['blue','black','lightblue','green','red']
         fig, ax = plt.subplots()
         ax.stackplot(self.day_array, data.values(),
-                     labels=data.keys())
+                     labels=data.keys(), colors=color)
         ax.legend(loc='upper left')
         ax.set_title('World population')
         ax.set_xlabel('Year')
