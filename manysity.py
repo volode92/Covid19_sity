@@ -95,24 +95,8 @@ def take_poind_pos(x, y, i):
         return x + dist_district['4']['l'], y + dist_district['4']['u']
 
 
-def Transfer(arr_people):
-    if random.randint(0, 100) < percent_chanse_transfer:
-        rand_distr = random.randint(0, 3)
-        rand_distr2 = random.randint(0, 3)
-        while rand_distr == rand_distr2:
-            rand_distr2 = random.randint(0, 3)
-        rand_peop = random.randint(0, len(arr_people[rand_distr]) - 1)
-        while arr_people[rand_distr][rand_peop].live == False:
-            rand_peop = random.randint(0, len(arr_people[rand_distr]) - 1)
-        tmp_peop = arr_people[rand_distr].pop(rand_peop)
-        tmp_peop.district = rand_distr2
-        tmp_peop.posx, tmp_peop.posy = take_poind_pos(random.randint(5, SIZE_DISTRICT_X - 5),
-                                                      random.randint(5, SIZE_DISTRICT_Y - 5), rand_distr2)
-        arr_people[rand_distr2].append(tmp_peop)
-    return arr_people
 
-
-def Show_info():
+def show_info():
     pygame.draw.rect(window, (255, 255, 255), pr1, 2)
     pygame.draw.rect(window, (255, 255, 255), pr2, 2)
     pygame.draw.rect(window, (255, 255, 255), pr3, 2)
@@ -257,28 +241,93 @@ class ChainComand():
                                                           random.randint(5, SIZE_DISTRICT_Y - 5), rand_distr2)
             self.sitylist[rand_distr2].people_list.append(tmp_peop)
 
+class Log():
+    def __init__(self):
+        self.live_people = []
+        self.die_people = []
+        self.ill_people = []
+        self.cure_people = []
+        self.disease_people = []
+        self.day = 0
+        self.day_array = []
 
-test = ChainComand(1000) #создаем города с людьми
-test.start_inf()
+    def update_data(self, sitieslist):
+        self.day += 1
+        tmp_live = 0
+        tmp_die = 0
+        tmp_ill = 0
+        tmp_cure = 0
+        tmp_disease = 0
+        for sity in sitieslist:
+            for ppl in sity.people_list:
+                if ppl.live == False:
+                    tmp_die += 1
+                    continue
+                if ppl.disease:
+                    tmp_disease += 1
+                    continue
+                if ppl.ill:
+                    tmp_ill += 1
+                    continue
+                if ppl.cure:
+                    tmp_cure += 1
+                    continue
+                tmp_live += 1
+        self.live_people.append(tmp_live)
+        self.die_people.append(tmp_die)
+        self.ill_people.append(tmp_ill)
+        self.cure_people.append(tmp_cure)
+        self.disease_people.append(tmp_disease)
+        self.day_array.append(self.day)
+        if tmp_disease == 0:
+            return False
+        return True
 
+    def show_graph(self):
+        data = {
+            'live_people': self.live_people,
+            'die_people': self.die_people,
+            'ill_people': self.ill_people,
+            'cure_people': self.cure_people,
+            'disease_people': self.disease_people,
+        }
+        fig, ax = plt.subplots()
+        ax.stackplot(self.day_array, data.values(),
+                     labels=data.keys())
+        ax.legend(loc='upper left')
+        ax.set_title('World population')
+        ax.set_xlabel('Year')
+        ax.set_ylabel('Number of people (millions)')
+
+        plt.show()
+
+
+
+
+CoR = ChainComand(1000) #создаем города с людьми
+CoR.start_inf()
+log = Log()
 
 frame = 0
 start_time = time.time()
-while True:
+END = True
+while END:
     frame += 1
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
     fpsClock.tick(FPS)
     window.fill((0, 0, 0))
-    Show_info()
-    test.drow_poin()
+    show_info()
+    CoR.drow_poin()
     pygame.display.update()
-    test.fast_check()
-    test.transfer()
+    CoR.fast_check()
+    CoR.transfer()
     if frame % FPS == 0:
-        print(frame, '%.07f' % (time.time() - start_time))
+        END = log.update_data(CoR.sitylist)
+        #print(frame, '%.07f' % (time.time() - start_time))
         start_time = time.time()
 
+log.show_graph()
 
 pygame.quit()
